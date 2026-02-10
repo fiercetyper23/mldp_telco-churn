@@ -3,18 +3,18 @@ import pandas as pd
 import joblib
 import numpy as np
 
-# =========================
+
 # Page config + styling
-# =========================
+
 st.set_page_config(
     page_title="Telco Churn Predictor",
     page_icon="📱",
     layout="wide"
 )
 
-# =========================
+
 # Load model (cached)
-# =========================
+
 @st.cache_resource
 def load_model():
     return joblib.load("model.pkl")
@@ -25,11 +25,9 @@ except FileNotFoundError:
     st.error("Model file 'model.pkl' not found. Please ensure it is in the same directory as streamlit_app.py.")
     st.stop()
 
-# =========================
-# Feature Engineering (ONLY if your model was trained on FE data)
-# If you trained gb_tuned on X_train_fe / X_test_fe, keep this ON.
-# If you trained directly on raw X_train / X_test, set USE_FE = False.
-# =========================
+
+# Feature Engineering function
+
 USE_FE = True
 
 def add_features_telco(X: pd.DataFrame) -> pd.DataFrame:
@@ -55,15 +53,15 @@ def add_features_telco(X: pd.DataFrame) -> pd.DataFrame:
 
     return X
 
-# =========================
+
 # Sidebar: controls
-# =========================
+
 st.sidebar.header("⚙️ Controls")
 
 threshold = st.sidebar.slider(
     "Decision Threshold",
     min_value=0.10, max_value=0.90, value=0.50, step=0.01,
-    help="Lower threshold catches more churners (higher recall) but may increase false alarms (lower precision)."
+    help="How strict do you want the decision threshold to be? Lower values mean more customers are classified as 'Churn'."
 )
 
 show_inputs = st.sidebar.checkbox("Show input row", value=True)
@@ -73,18 +71,18 @@ st.sidebar.divider()
 st.sidebar.caption("Model file: model.pkl")
 st.sidebar.caption("App file: streamlit_app.py")
 
-# =========================
+
 # Main: title + tabs
-# =========================
+
 st.title("📱 Telco Customer Churn Predictor")
 st.write("Enter customer details to predict churn risk and churn probability.")
 
-tab_predict, tab_about = st.tabs(["🔮 Predict", "ℹ️ About"])
+tab_predict, tab_about = st.tabs(["Predict", "About"])
 
 with tab_predict:
-    # =========================
+    # --------------------
     # Input Form
-    # =========================
+
     with st.form("churn_form"):
         st.subheader("Customer Demographics")
         c1, c2, c3, c4 = st.columns(4)
@@ -143,9 +141,9 @@ with tab_predict:
 
         submitted = st.form_submit_button("Predict Churn")
 
-    # =========================
+    
     # Prediction Logic
-    # =========================
+        
     if submitted:
         senior_citizen_val = 1 if senior_citizen == "Yes" else 0
 
@@ -171,16 +169,16 @@ with tab_predict:
             "TotalCharges": [total_charges],
         })
 
-        # Apply FE if your training used X_train_fe / X_test_fe
+        # Apply FE if training used X_train_fe / X_test_fe
         input_for_model = add_features_telco(input_data) if USE_FE else input_data
 
         # Predict
         proba = float(model.predict_proba(input_for_model)[0, 1])
         pred = int(proba >= threshold)
 
-        # =========================
+        
         # Output (metrics + visuals)
-        # =========================
+        
         st.divider()
 
         out1, out2, out3 = st.columns(3)
@@ -232,15 +230,14 @@ with tab_about:
     st.subheader("About this app")
     st.write(
         "This app predicts **Telco Customer Churn** using a trained **Gradient Boosting** model.\n\n"
-        "Deployment flow (as per your slides):\n"
+        "Deployment flow:\n"
         "1) Save trained model (`model.pkl`)\n"
         "2) Load model in Streamlit\n"
         "3) Collect unseen user input\n"
         "4) Apply the same preprocessing/feature engineering\n"
-        "5) Predict churn probability and decision label\n"
+        "5) Predict churn probability\n"
     )
 
     st.info(
-        "If you trained your final model on **feature-engineered data** (tenure_group/services_count/is_month_to_month), "
-        "keep `USE_FE = True`. If your final model was trained on raw features only, set `USE_FE = False`."
+        "Built by Zulzawaid Bin Zuikifli for MLDP Project."
     )
