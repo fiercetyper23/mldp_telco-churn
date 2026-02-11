@@ -56,7 +56,7 @@ def add_features_telco(X: pd.DataFrame) -> pd.DataFrame:
 
 # Sidebar: controls
 
-st.sidebar.header("⚙️ Controls")
+st.sidebar.header("Controls")
 
 threshold = st.sidebar.slider(
     "Decision Threshold",
