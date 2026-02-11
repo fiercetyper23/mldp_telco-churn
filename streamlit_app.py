@@ -74,13 +74,13 @@ st.sidebar.caption("App file: streamlit_app.py")
 
 # Main: title + tabs
 
-st.title("📱 Telco Customer Churn Predictor")
+st.title("Telco Customer Churn Predictor")
 st.write("Enter customer details to predict churn risk and churn probability.")
 
 tab_predict, tab_about = st.tabs(["Predict", "About"])
 
 with tab_predict:
-    # --------------------
+    
     # Input Form
 
     with st.form("churn_form"):
